@@ -1,0 +1,39 @@
+import streamlit as st
+
+def breakdown(number):
+    n = str(number).zfill(4)
+    hasil = []
+    hasil.append(sum(int(d) for d in n) % 10)
+    hasil.append(int(n[0] + n[1]))
+    hasil.append(int(n[1] + n[2]))
+    hasil.append(int(n[2] + n[3]))
+    hasil.append(int(n[0] + n[2]))
+    return hasil
+
+st.title("Prediksi Angka Selanjutnya berdasarkan Pola Angka Merah")
+
+deret_input = st.text_area("Masukkan deret angka (pisahkan dengan koma)", 
+    "6627,8941,3832,2196,7680,2766,4308,6239,7062,3237,4495,5161,1935,2681,8313,3786,0506,1887")
+
+if st.button("Prediksi Angka Selanjutnya"):
+    try:
+        deret_awal = [int(x.strip()) for x in deret_input.split(",")]
+
+        angka_merah_sebelumnya = set()
+        for angka in deret_awal:
+            turunan = breakdown(angka)
+            angka_merah_sebelumnya.update(turunan)
+
+        kandidat = []
+        for num in range(1000, 9999):
+            turun = breakdown(num)
+            cocok = [x for x in turun if x in angka_merah_sebelumnya]
+            if len(cocok) >= 3:
+                kandidat.append((num, cocok))
+
+        st.subheader("Kandidat Angka Berikutnya:")
+        for angka, cocok in kandidat[:10]:
+            st.write(f"🔢 {angka} — cocok dengan: {cocok}")
+
+    except Exception as e:
+        st.error(f"Terjadi kesalahan: {e}")
